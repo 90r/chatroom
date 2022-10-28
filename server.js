@@ -29,6 +29,7 @@ io.on('connection',(socket)=>{
         connected_user.push(username);
         console.log(connected_user);
         update_username();
+
     })
     //recieve msg
     socket.on('chat message',msg=>{
