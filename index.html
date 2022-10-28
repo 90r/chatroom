@@ -82,7 +82,7 @@
         const chatcol=document.getElementById('chat-col')
 
         //connect to socket.io
-        var socket = io({'timeout':5000, 'connect timeout':5000});
+        var socket = io('https://minictroom.pages.dev');
 
         //check for connection
         if(socket!==undefined){
