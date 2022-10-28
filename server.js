@@ -3,8 +3,8 @@ const app = express();
 const server = require('http').createServer(app);
 // const io = require('socket.io').listen(server).sockets;
 const io = require("socket.io")(server, {cors: {origin: '*'}});
-var cors = require('cors');
-// app.use(cors())
+const cors = require('cors');
+app.use(cors())
 app.get('/',(req,res)=>{
     res.sendFile(__dirname+'/index.html');
 });
