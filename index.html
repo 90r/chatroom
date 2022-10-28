@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Let's Chat!</title>
+</head>
+
+<body>
+<nav>
+    <div class="nav-wrapper grey lighten-1">
+        <a href="" class="brand-logo center">Let's Chat!</a>
+    </div>
+</nav>
+<br><br>
+<div class="row">
+    <div class="col s4">
+        <!-- Connected Userlist -->
+        <h3 class="flow-text center blue-grey-text text-lighten-1">CONNECTED USER</h3>
+        <ul class="collection" id="user-list"></ul>
+    </div>
+    <!-- Message Area -->
+    <div id="chat-col" class="col s8" style="display: none;">
+        <div class="card blue-grey lighten-5">
+            <div id="messages" class="card-content white-text"></div>
+                <div class="card-action white">
+                    <!-- Message Form -->
+                    <form id="message-form">
+                        <div class="input-field">
+                            <textarea type="text" id="textarea" class="materialize-textarea"></textarea>
+                            <label for="textarea" class="active">MESSAGE</label>
+                        </div>
+                        <div class="right-align">
+                            <button class="btn waves-effect waves-light indigo lighten-3 btn-small" type="submit" name="action">SEND
+                                <i class="material-icons right">send</i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+        </div>
+    </div>
+    <!-- Login area   -->
+    <div id="login-col" class="col s8" style="display: block;">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title indigo-text text-lighten-2">Give yourself a nickname</span>
+                <!-- Login Form -->
+                <form id="login-form">
+                    <div class="input-field">
+                        <input type="text" id="name">
+                        <label for="name" class="active">Name</label>
+                    </div>
+                    <div class="right-align">
+                        <button class="btn waves-effect waves-light indigo lighten-3 btn-small" type="submit" name="action">Let's Chat!
+                            <i class="material-icons right">chat</i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+<!--JavaScript at end of body for optimized loading-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+<script>
+    (function(){
+        //Get Elements
+        const loginform=document.getElementById('login-form')
+        const msgform=document.getElementById('message-form')
+        const msg=document.getElementById('messages')
+        const userlist=document.getElementById('user-list')
+        const logincol=document.getElementById('login-col')
+        const chatcol=document.getElementById('chat-col')
+
+        //connect to socket.io
+        var socket = io({'timeout':5000, 'connect timeout':5000});
+
+        //check for connection
+        if(socket!==undefined){
+            console.log('Connected to socket...')
+        }
+        //update username
+        socket.on('loaduser',users=>{
+            userlist.innerText="";
+            users.forEach(user=>{
+                let userli=document.createElement('li');
+                userli.setAttribute('class','collection-item');
+                userli.innerHTML=`<h6 class="center">${user}</h6>`;
+                userlist.insertBefore(userli,userlist.lastChild);
+            })
+        })
+
+        //submit login form
+        loginform.addEventListener('submit',e=>{
+            e.preventDefault();
+            let username=document.getElementById('name').value;
+            //emit login
+            socket.emit('login',username,()=>{
+                logincol.style="display: none";
+                chatcol.style="display: block";
+
+                //add welcome msg
+                let message=document.createElement('p');
+                message.setAttribute('class','center blue-grey-text text-lighten-1');
+                message.textContent=`Welcome ${username} joined Chat!`;
+                msg.insertBefore(message,msg.lastElementChild)
+            })
+        })
+
+        //submit message
+        msgform.addEventListener('submit',e=>{
+            e.preventDefault();
+            let msg=document.getElementById('textarea').value;
+            document.getElementById('textarea').value='';
+            socket.emit('chat message',msg);
+
+        })
+        //add msg to card
+        socket.on('output',data=>{
+            let new_msg=document.createElement('h6')
+            new_msg.textContent=data.name+"："+data.msg+"        |"+data.time;
+            new_msg.setAttribute('class','brown text-lighten-1');
+            // msg.appendChild(new_msg)
+            msg.insertBefore(new_msg,msg.lastChild);
+
+        })
+    })();
+</script>
+</body>
+</html>
