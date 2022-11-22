@@ -130,8 +130,11 @@ io.on('connection',(socket)=>{
                     headers:header
                 }
             ).then((res)=>{
-                info=res.data.smartResult.entries
-                socket.emit('xxx',info,tag)
+                try{
+                    info=res.data.smartResult.entries
+                    socket.emit('xxx',info,tag)
+                }catch {}
+
             });
 
         });
