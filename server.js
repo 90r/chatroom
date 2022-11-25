@@ -120,7 +120,7 @@ io.on('connection',(socket)=>{
             }
             header['Cookie']=cookie
             obj=r(msg)
-            console.log(obj)
+            // console.log(obj)
             data = {
                 'i': msg,
                 'from': 'AUTO',
@@ -149,10 +149,10 @@ io.on('connection',(socket)=>{
                 try{
                     if(res.data.errorCode===0){
                         info=res.data.translateResult[0][0].tgt
-                        console.log(info)
+                        // console.log(info)
                         socket.emit('xxx',info,tag)
                     }else if(res.data.errorCode===40){
-                        info="有道翻译不出"
+                        info="翻译不出来诶"
                         socket.emit('xxx',info,tag)
                     }
                 }catch {}

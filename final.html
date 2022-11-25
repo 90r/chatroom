@@ -30,7 +30,7 @@
   <div id="chat-col" class="col s8" style="display: none;">
     <div class="card blue-grey lighten-5">
       <div id="messages" class="card-content white-text" style="overflow-y:scroll;height: 600px"></div>
-      <div class="card-action white">
+      <div class="card-action white" id="scard">
         <!-- Message Form -->
         <form id="message-form">
           <div class="input-field">
@@ -86,6 +86,7 @@
 <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+
 <script>
   (function(){
     //Get Elements
@@ -93,11 +94,23 @@
     const msgform=document.getElementById('message-form')
     const file_=document.getElementById('file')
     const emoji_=document.getElementById('emoji')
-    console.log(emoji_);
     const msg=document.getElementById('messages')
     const userlist=document.getElementById('user-list')
     const logincol=document.getElementById('login-col')
     const chatcol=document.getElementById('chat-col')
+
+    //add emoji
+    function addtomsg(a,b){
+      let msg=document.getElementById('textarea')
+      msg.value+=a.native
+    }
+    const pickerOptions = { onEmojiSelect: addtomsg }
+    const picker = new EmojiMart.Picker(pickerOptions)
+    picker.style="display: none"
+    scard=document.getElementById('scard')
+    // msg.insertBefore(picker,scard)
+    msg.append(picker)
+
 
 
     //connect to socket.io
@@ -129,6 +142,15 @@
         userli.innerHTML=`<h6 class="center">${user}</h6>`;
         userlist.insertBefore(userli,userlist.lastChild);
       })
+    })
+    // 监听点击事件，隐藏表情包的框
+    document.addEventListener('click', (e) => {
+      picker.style="display: none"
+    })
+
+    //防止emoji点击一次就消失
+    picker.addEventListener('click',(e) => {
+      e.stopPropagation()
     })
 
     //submit login form
@@ -171,15 +193,11 @@
       }
     });
 
-    //add emoji
+
+    //show emoji
     emoji_.addEventListener('click',(e)=>{
-      function addtomsg(a,b){
-        let msg=document.getElementById('textarea')
-        msg.value+=a.native
-      }
-      const pickerOptions = { onEmojiSelect: addtomsg }
-      const picker = new EmojiMart.Picker(pickerOptions)
-      document.body.appendChild(picker)
+      e.stopPropagation();
+      picker.style="float: left"
     })
 
 
