@@ -2,13 +2,17 @@ const express = require('express');
 const crypto = require('crypto');
 const app = express();
 const server = require('http').createServer(app);
+
 // const io = require('socket.io').listen(server).sockets;
 const io = require("socket.io")(server, {cors: {origin: '*'}});
 const cors = require('cors');
 const axios = require("axios");
+const path = require('path');
 app.use(cors())
+app.use('/public',express.static('./public'));
+
 app.get('/',(req,res)=>{
-    res.sendFile(__dirname+'/index.html');
+    res.sendFile(__dirname+'/final.html');
 });
 
 
@@ -46,6 +50,17 @@ io.on('connection',(socket)=>{
             time:new Date().toLocaleTimeString(),
         })
     })
+    //receive pic
+    socket.on('sendimg',msg=>{
+        // console.log(msg)
+        io.emit('showpic',{
+            name:username,
+            msg:msg,
+            time:new Date().toLocaleTimeString(),
+        })
+    })
+
+
     //receive translate
     socket.on('tran',(msg,tag)=>{
         md5_enc=function (x){
@@ -85,7 +100,7 @@ io.on('connection',(socket)=>{
             headers:headers
         }).then((res)=>{
             cookie=res.headers.get('set-cookie')[0].slice(0,47);
-            console.log(cookie);
+            // console.log(cookie);
             header = {
                 'Accept': 'application/json, text/javascript, */*; q=0.01',
                 'Accept-Language': 'en',
@@ -105,6 +120,7 @@ io.on('connection',(socket)=>{
             }
             header['Cookie']=cookie
             obj=r(msg)
+            console.log(obj)
             data = {
                 'i': msg,
                 'from': 'AUTO',
@@ -120,8 +136,8 @@ io.on('connection',(socket)=>{
                 'keyfrom': 'fanyi.web',
                 'action': 'FY_BY_REALTlME',
             }
-            console.log(data)
-            console.log(header)
+            // console.log(data)
+            // console.log(header)
             const response = axios.post(
                 'https://fanyi.youdao.com/translate_o',
                 new URLSearchParams(data),
@@ -131,8 +147,14 @@ io.on('connection',(socket)=>{
                 }
             ).then((res)=>{
                 try{
-                    info=res.data.smartResult.entries
-                    socket.emit('xxx',info,tag)
+                    if(res.data.errorCode===0){
+                        info=res.data.translateResult[0][0].tgt
+                        console.log(info)
+                        socket.emit('xxx',info,tag)
+                    }else if(res.data.errorCode===40){
+                        info="有道翻译不出"
+                        socket.emit('xxx',info,tag)
+                    }
                 }catch {}
 
             });

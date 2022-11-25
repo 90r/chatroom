@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--Import Google Icon Font-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!--Import materialize.css-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" href="public/index.css" />
+
+  <!--Let browser know website is optimized for mobile-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Let's Chat!</title>
+
+</head>
+
+<body>
+<nav>
+  <div class="nav-wrapper grey lighten-1">
+    <a href="" class="brand-logo center">Let's Chat!</a>
+  </div>
+</nav>
+<br><br>
+<div class="row">
+  <div class="col s4">
+    <!-- Connected Userlist -->
+    <h3 class="flow-text center blue-grey-text text-lighten-1">CONNECTED USER</h3>
+    <ul class="collection" id="user-list" style="overflow-y:scroll;height: 688px"></ul>
+  </div>
+  <!-- Message Area -->
+  <div id="chat-col" class="col s8" style="display: none;">
+    <div class="card blue-grey lighten-5">
+      <div id="messages" class="card-content white-text" style="overflow-y:scroll;height: 600px"></div>
+      <div class="card-action white">
+        <!-- Message Form -->
+        <form id="message-form">
+          <div class="input-field">
+            <textarea type="text" id="textarea" class="materialize-textarea"></textarea>
+            <label for="textarea" class="active"></label>
+          </div>
+
+          <div class="box-ft" style="position: absolute">
+            <div class="toolbar">
+              <a href="javascript:;" title="emoji" class="emoji" id="emoji"></a>
+              <a href="javascript:;" title="pic" class="file">
+                <label for="file"></label>
+                <input type="file" id="file" accept=".jpg, .png ,.webp ,jpeg" style="display: none;">
+              </a>
+            </div>
+          </div>
+
+          <div class="right-align">
+            <button class="btn waves-effect waves-light indigo lighten-3 btn-small" type="submit" name="action">SEND
+              <i class="material-icons right">send</i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Login area   -->
+  <div id="login-col" class="col s8" style="display: block;">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title indigo-text text-lighten-2">Give yourself a nickname</span>
+        <!-- Login Form -->
+        <form id="login-form">
+          <div class="input-field">
+            <input type="text" id="name">
+            <label for="name" class="active">Name</label>
+          </div>
+          <div class="right-align">
+            <button class="btn waves-effect waves-light indigo lighten-3 btn-small" type="submit" name="action">Let's Chat!
+              <i class="material-icons right">chat</i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+<!--JavaScript at end of body for optimized loading-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+<script>
+  (function(){
+    //Get Elements
+    const loginform=document.getElementById('login-form')
+    const msgform=document.getElementById('message-form')
+    const file_=document.getElementById('file')
+    const emoji_=document.getElementById('emoji')
+    console.log(emoji_);
+    const msg=document.getElementById('messages')
+    const userlist=document.getElementById('user-list')
+    const logincol=document.getElementById('login-col')
+    const chatcol=document.getElementById('chat-col')
+
+
+    //connect to socket.io
+    var socket = io();
+
+    window.xx = function xx(data,tag){
+      console.log(decodeURIComponent(atob(data)))
+      socket.emit('tran',decodeURIComponent(atob(data)),tag)
+      socket.on('xxx',(con,tag)=>{
+        // console.log(con);
+        let tra=document.getElementById(tag)
+        br=document.createElement('br')
+        tra.appendChild(br)
+        textnode=document.createTextNode(JSON.stringify(con))
+        tra.appendChild(textnode)
+        delete socket._callbacks.$xxx
+      })
+    }
+    //check for connection
+    if(socket!==undefined){
+      console.log('Connected to socket...')
+    }
+    //update username
+    socket.on('loaduser',users=>{
+      userlist.innerText="";
+      users.forEach(user=>{
+        let userli=document.createElement('li');
+        userli.setAttribute('class','collection-item');
+        userli.innerHTML=`<h6 class="center">${user}</h6>`;
+        userlist.insertBefore(userli,userlist.lastChild);
+      })
+    })
+
+    //submit login form
+    loginform.addEventListener('submit',e=>{
+      e.preventDefault();
+      let username=document.getElementById('name').value;
+      //emit login
+      socket.emit('login',username,()=>{
+        logincol.style="display: none";
+        chatcol.style="display: block";
+
+        //add welcome msg
+        let message=document.createElement('p');
+        message.setAttribute('class','center blue-grey-text text-lighten-1');
+        message.textContent=`Welcome ${username} joined Chat!`;
+        msg.insertBefore(message,msg.lastElementChild)
+      })
+    })
+
+    //submit message
+    msgform.addEventListener('submit',e=>{
+      e.preventDefault();
+      let msg=document.getElementById('textarea').value;
+      document.getElementById('textarea').value='';
+      if(msg!==''){
+        socket.emit('chat message',msg);
+      }
+    })
+    //upload file
+    file_.addEventListener('change', (e) => {
+      const file = e.target.files;
+      let pic_file=file[0]
+      console.log('file', pic_file);
+      pf=new FileReader();
+      pf.readAsDataURL(pic_file)
+      pf.onload=function(){
+        socket.emit('sendimg',pf.result)
+        //value置空可以重复上传同一张图片
+        file_.value=''
+      }
+    });
+
+    //add emoji
+    emoji_.addEventListener('click',(e)=>{
+      function addtomsg(a,b){
+        let msg=document.getElementById('textarea')
+        msg.value+=a.native
+      }
+      const pickerOptions = { onEmojiSelect: addtomsg }
+      const picker = new EmojiMart.Picker(pickerOptions)
+      document.body.appendChild(picker)
+    })
+
+
+    //add msg to card
+    socket.on('output',data=>{
+      let new_msg=document.createElement('h6')
+      //这样设置保留空格
+      new_msg.style="white-space:pre"
+      // let a=document.createElement('button')
+      // a.innerHTML=style="float: right;" onclick="xx()"'
+      // a.innerText="翻译"
+      let tag=new Date().getTime().toString()
+      new_msg.id = tag
+      new_msg.textContent=data.name+"："+data.msg+"                                       "+data.time;
+      new_msg.setAttribute('class','brown-text text-lighten-1');
+      // msg.appendChild(new_msg)
+      msg.append(new_msg)
+      // msg.insertBefore(new_msg,msg.lastChild);
+      // new_msg.appendChild(a)
+      console.log(data.msg);
+      new_msg.innerHTML += `<button style="float: right;" onclick="xx('${btoa(encodeURIComponent(data.msg))}','${tag}')">翻译</button>`
+      //滚动条始终在最底部
+      msg.scrollTop=msg.scrollHeight-600
+    })
+
+    //add pic to card
+    socket.on('showpic',data=>{
+      let new_msg=document.createElement('h6')
+      //这样设置保留空格
+      new_msg.style="white-space:pre"
+      // let a=document.createElement('button')
+      // a.innerHTML=style="float: right;" onclick="xx()"'
+      // a.innerText="翻译"
+      let tag=new Date().getTime().toString()
+      new_msg.id = tag
+      new_msg.textContent=data.name+"                                       "+data.time;
+      new_msg.setAttribute('class','brown-text text-lighten-1');
+      // msg.appendChild(new_msg)
+      msg.append(new_msg)
+      // msg.insertBefore(new_msg,msg.lastChild);
+      // new_msg.appendChild(a)
+      new_msg.innerHTML += `<div><img src="${data.msg}" style="width: 200px;height: 200px" </img></div>`
+      //滚动条始终在最底部
+      msg.scrollTop=msg.scrollHeight-600
+    })
+
+
+
+
+  })();
+</script>
+</body>
+</html>
