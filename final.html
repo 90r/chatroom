@@ -165,6 +165,8 @@
         //add welcome msg
         let message=document.createElement('p');
         message.setAttribute('class','center blue-grey-text text-lighten-1');
+        message.style.fontWeight="bold"
+        message.style.fontSize="20px"
         message.textContent=`Welcome ${username} joined Chat!`;
         msg.insertBefore(message,msg.lastElementChild)
       })
@@ -205,20 +207,20 @@
     socket.on('output',data=>{
       let new_msg=document.createElement('h6')
       //这样设置保留空格
-      new_msg.style="white-space:pre"
+      new_msg.style="white-space:pre;"
       // let a=document.createElement('button')
       // a.innerHTML=style="float: right;" onclick="xx()"'
       // a.innerText="翻译"
       let tag=new Date().getTime().toString()
       new_msg.id = tag
-      new_msg.textContent=data.name+"："+data.msg+"                                       "+data.time;
+      new_msg.textContent=data.name+"："+data.msg+"                                           "+data.time;
       new_msg.setAttribute('class','brown-text text-lighten-1');
       // msg.appendChild(new_msg)
       msg.append(new_msg)
       // msg.insertBefore(new_msg,msg.lastChild);
       // new_msg.appendChild(a)
       console.log(data.msg);
-      new_msg.innerHTML += `<button style="float: right;" onclick="xx('${btoa(encodeURIComponent(data.msg))}','${tag}')">翻译</button>`
+      new_msg.innerHTML += `<button class="btn waves-effect waves-light indigo lighten-3 btn-small" style="float: right;" onclick="xx('${btoa(encodeURIComponent(data.msg))}','${tag}')">翻译</button>`
       //滚动条始终在最底部
       msg.scrollTop=msg.scrollHeight-600
     })
