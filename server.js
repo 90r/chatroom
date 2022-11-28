@@ -33,7 +33,7 @@ io.on('connection',(socket)=>{
         if(name.trim().length===0){
             return;
         }
-        // console.log(callback);
+        //跳转到发送信息
         callback(true);
         username=name;
         connected_user.push(username);

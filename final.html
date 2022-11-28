@@ -207,7 +207,7 @@
     socket.on('output',data=>{
       let new_msg=document.createElement('h6')
       //这样设置保留空格
-      new_msg.style="white-space:pre;"
+      new_msg.style="white-space:pre;font-size: 1.35rem;;"
       // let a=document.createElement('button')
       // a.innerHTML=style="float: right;" onclick="xx()"'
       // a.innerText="翻译"
@@ -220,7 +220,9 @@
       // msg.insertBefore(new_msg,msg.lastChild);
       // new_msg.appendChild(a)
       console.log(data.msg);
-      new_msg.innerHTML += `<button class="btn waves-effect waves-light indigo lighten-3 btn-small" style="float: right;" onclick="xx('${btoa(encodeURIComponent(data.msg))}','${tag}')">翻译</button>`
+      // new_msg.innerHTML += `<button class="btn waves-effect waves-light indigo lighten-3 btn-small" style="float: right;" onclick="xx('${btoa(encodeURIComponent(data.msg))}','${tag}')">翻译</button>`
+      new_msg.innerHTML += `<a class="waves-effect waves-light indigo lighten-3 btn-small right" onclick="xx('${btoa(encodeURIComponent(data.msg))}','${tag}')">翻译</a>`
+
       //滚动条始终在最底部
       msg.scrollTop=msg.scrollHeight-600
     })
