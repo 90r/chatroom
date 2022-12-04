@@ -183,12 +183,14 @@
     })
     //upload file
     file_.addEventListener('change', (e) => {
+      console.log(e);
       const file = e.target.files;
       let pic_file=file[0]
       console.log('file', pic_file);
       pf=new FileReader();
       pf.readAsDataURL(pic_file)
       pf.onload=function(){
+        // console.log(pf.result);
         socket.emit('sendimg',pf.result)
         //value置空可以重复上传同一张图片
         file_.value=''
@@ -229,6 +231,7 @@
 
     //add pic to card
     socket.on('showpic',data=>{
+      console.log(data);
       let new_msg=document.createElement('h6')
       //这样设置保留空格
       new_msg.style="white-space:pre"
