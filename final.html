@@ -224,7 +224,6 @@
       console.log(data.msg);
       // new_msg.innerHTML += `<button class="btn waves-effect waves-light indigo lighten-3 btn-small" style="float: right;" onclick="xx('${btoa(encodeURIComponent(data.msg))}','${tag}')">翻译</button>`
       new_msg.innerHTML += `<a class="waves-effect waves-light indigo lighten-3 btn-small right" onclick="xx('${btoa(encodeURIComponent(data.msg))}','${tag}')">翻译</a>`
-
       //滚动条始终在最底部
       msg.scrollTop=msg.scrollHeight-600
     })

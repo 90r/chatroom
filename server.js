@@ -99,7 +99,8 @@ io.on('connection',(socket)=>{
         const response = axios.get('https://fanyi.youdao.com/', {
             headers:headers
         }).then((res)=>{
-            cookie=res.headers.get('set-cookie')[0].slice(0,47);
+            // console.log(res.headers)
+            // cookie=res.headers.get('set-cookie')[0].slice(0,47);
             // console.log(cookie);
             header = {
                 'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -118,7 +119,7 @@ io.on('connection',(socket)=>{
                 'sec-ch-ua-mobile': '?0',
                 'sec-ch-ua-platform': '"Windows"',
             }
-            header['Cookie']=cookie
+            // header['Cookie']=''
             obj=r(msg)
             // console.log(obj)
             data = {
